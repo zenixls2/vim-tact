@@ -7,12 +7,24 @@ if exists("b:current_syntax")
   finish
 endif
 
+syn region tactParen start=+(+ end=+)+ contains=tactStructInit,tactDelType,tactNumber,tactString,tactBoolean,tactOperator,tactKeyword,tactDelimiter skipwhite skipempty
+syn region tactStructInit contained start=/[A-Z][a-zA-Z0-9_]*[ ]*{/ end=/}/ contains=tactBoolean,tactNumber,tactString,tactOperator,tactGlobalFunc,tactKeyword,tactDelimiter,tactInitItem,tactOperator skipwhite skipempty
+syn match tactInitItem contained /:/ nextgroup=tactBoolean,tactString,tactNumber,tactGlobalFunc,tactStructInit skipwhite
+syn match tactDelType contained /:/ nextgroup=tactKeyword,tactBoolean,tactFuncName,tactBuiltinType,tactCustomType skipwhite
+syn match tactCustomType contained /[A-Z][a-zA-Z0-9_]*/
+
+hi def link tactDelType Special
+hi def link tactInitItem Special
+hi def link tactCustomType Identifier
+
+syn keyword tactGlobalFunc toCell myAddress send require context
+hi def link tactGlobalFunc Special
+
 syn keyword tactKeyword get native extends mutates virtual override inline abstract
-syn keyword tactKeyword const import
+syn keyword tactKeyword const import with return
 syn keyword tactKeyword if else while do until repeat return let fun self is initOf map bounced as
 syn keyword tactBoolean false true
-syn keyword tactKeywordReturn return
-syn keyword tactBuiltinType Int Address Cell Slice uint64 coins remaining
+syn keyword tactBuiltinType Int Address Cell Slice uint64 coins remaining Context Bool StateInit
 syn keyword tactConditional if
 syn match tactNumber /\<-\=\d\+L\=\>\|\<0[xX]\x\(\x\|_\)*\>/
 syn region tactString start=+"+ skip=+\\\\\|\\$+ end=+"+
@@ -25,20 +37,18 @@ hi def link tactBuiltinType Type
 hi def link tactNumber Number
 hi def link tactString String
 
-hi def link tactKeywordReturn Return
+"syn match tactFunction /\<fun\>/ nextgroup=tactFuncName,tactFuncArgs skipwhite
+"syn match tactFuncName contained /\<[a-zA-Z_$][0-9a-zA-Z_$]*/ nextgroup=tactFuncArgs skipwhite
+"syn region tactFuncArgs contained matchgroup=tactFuncParens start='(' end=')' contains=tactFuncArgCommas,tactFuncTypeDelimter,tactBuiltinType keepend skipwhite skipempty
+"syn match tactModifierName contained /\<[a-zA-Z_$][0-9a-zA-Z_$]*/ nextgroup=tactModifierArgs,tactModifierName skipwhite
+"syn region tactModifierArgs contained matchgroup=tactFuncParens start='(' end=')' contains=tactFuncArgCommas,tactFuncTypeDelimiter nextgroup=tactModifierName,tactFuncReturns skipwhite
+"syn region tactFuncReturns contained matchgroup=tactFuncParens start='(' end=')' contains=tactFuncArgCommas,tactFuncTypeDelimiter,tactBuiltinType
+"syn match tactFuncArgCommas contained ','
+"syn match tactFuncTypeDelimter contained ':'
 
-syn match tactFunction /\<fun\|$\>/ nextgroup=tactFuncName,tactFuncArgs skipwhite
-syn match tactFuncName contained /\<[a-zA-Z_$][0-9a-zA-Z_$]*/ nextgroup=tactFuncArgs skipwhite
-syn region tactFuncArgs contained matchgroup=tactFuncParens start='(' end=')' contains=tactFuncArgCommas,tactFuncTypeDelimter,tactBuiltinType keepend skipwhite skipempty
-syn match tactModifierName contained /\<[a-zA-Z_$][0-9a-zA-Z_$]*/ nextgroup=tactModifierArgs,tactModifierName skipwhite
-syn region tactModifierArgs contained matchgroup=tactFuncParens start='(' end=')' contains=tactFuncArgCommas,tactFuncTypeDelimiter nextgroup=tactModifierName,tactFuncReturns skipwhite
-syn region tactFuncReturns contained matchgroup=tactFuncParens start='(' end=')' contains=tactFuncArgCommas,tactFuncTypeDelimiter,tactBuiltinType
-syn match tactFuncArgCommas contained ','
-syn match tactFuncTypeDelimter contained ':'
-
-hi def link tactFunction Type
-hi def link tactModifierName Function
-hi def link tactFuncName Function
+"hi def link tactFunction Type
+"hi def link tactModifierName Function
+"hi def link tactFuncName Function
 
 syn keyword tactClass message trait contract
 hi def link tactClass Label
@@ -46,11 +56,11 @@ hi def link tactClass Label
 syn match tactDecorator /\(@interface\)/
 hi def link tactDecorator Special
 
-syn match tactOperator  /\(!\||\|&\|+=\|+\|-\|!=\|<=\|>=\|=\)/
+syn match tactOperator  /\(!\||\|&\|+=\|+\|-\|!=\|<=\|>=\|=\|\*\|?\)/
 
 hi def link tactOperator Operator
 
-syn match tactDelimiter /\(,\|;\|:\)/
+syn match tactDelimiter /\(,\|;\)/
 hi def link tactDelimiter Special
 
 syn keyword tactCommentTodo TODO FIXME XXX TBD contained
